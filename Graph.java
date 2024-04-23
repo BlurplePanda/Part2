@@ -74,12 +74,24 @@ public class Graph {
                 Stop from = line.getStops().get(i);
                 Stop to   = line.getStops().get(i+1);
                 double distance = from.distanceTo(to);
+                if (isConnected(from, to)) {
+                    continue;
+                }
                 Edge edge = new Edge(from, to, transpType, line, distance);
                 from.addOutEdge(edge);
                 to.addInEdge(edge);
                 edges.add(edge);
             }
         }
+    }
+
+    private boolean isConnected(Stop stop1, Stop stop2) {
+        for (Edge e : stop1.getOutEdges()) {
+            if (e.toStop().equals(stop2)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //=============================================================================

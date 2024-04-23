@@ -35,13 +35,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -164,6 +158,9 @@ public class NetworkViewer {
 
     public Zoning zoneData;     // Data for drawing the coastline and zone boundaries
 
+    // kosaraju's stuff
+    private Map<Stop, Integer> components;
+
     /**
      * Entry Method: (Called by Main once the GUI has been set up)
      * Loads data into the graph from the 'data-full' directory.
@@ -190,7 +187,8 @@ public class NetworkViewer {
      */
     public void handleComponents(ActionEvent event) {
         event.consume();
-        Components.findComponents(graph);
+        components = Components.findComponents(graph);
+        drawMap(graph);
     }
 
     /**
@@ -286,6 +284,7 @@ public class NetworkViewer {
      */
     public void resetSearch(){
         pathEdges = null;
+        components = null;
     }
 
 
@@ -567,10 +566,45 @@ public class NetworkViewer {
             drawEdge(edge);
         }
 
-        // Draw the stops
-        for(Stop stop : graph.getStops()) {
-            drawStop(stop, STOP_SIZE, Color.BLUE);
+        if (components == null) {
+            for (Stop stop : graph.getStops()) {
+                drawStop(stop, STOP_SIZE, Color.BLUE);
+            }
         }
+        else {
+            int numComponents = new HashSet<>(components.values()).size();
+
+            // Draw the stops
+            Color[] subGraphColors = new Color[numComponents];
+            for (int i = 0; i < numComponents; i++) {
+                subGraphColors[i] = Color.hsb((180.0 + (i * 360.0 / numComponents)) % 360, 1, 1);
+            }
+            for (Stop stop : graph.getStops()) {
+                drawStop(stop, STOP_SIZE, subGraphColors[components.get(stop)]);
+            }
+
+            // reverse the components map, so it's nicer to use
+            Map<Integer, Set<Stop>> betterComponents = new HashMap<>();
+            for (Stop stop : components.keySet()) {
+                int componentNum = components.get(stop);
+                if (betterComponents.get(componentNum) == null) {
+                    betterComponents.put(componentNum, new HashSet<>(Set.of(stop)));
+                }
+                else {
+                    betterComponents.get(componentNum).add(stop);
+                }
+            }
+            // report all the strongly connected components in the text area
+            displayText.clear();
+            for (int componentNum : betterComponents.keySet()) {
+                displayText.appendText(componentNum+": ");
+                for (Stop stop : betterComponents.get(componentNum)) {
+                    displayText.appendText(stop.getId()+" ");
+                }
+                displayText.appendText("\n");
+            }
+        }
+
     }
 
 

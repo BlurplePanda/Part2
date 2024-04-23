@@ -37,7 +37,7 @@ public class Components{
         }
 
 
-        return new HashMap<Stop,Integer>(); //just to make it compile.
+        return components;
     }
 
     /**

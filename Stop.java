@@ -150,7 +150,7 @@ public class Stop implements Comparable<Stop> {
     //--------------------------------------------
     //  Setting and getting the neighbours of the stop
     //
-    //  outEdges is a collection of the (directed) edges out of the stop,
+    //  inEdges is a collection of the (directed) edges into the stop,
     //--------------------------------------------
 
     /** Get the collection of outEdges*/
@@ -160,11 +160,6 @@ public class Stop implements Comparable<Stop> {
 
     /** add a new edge out of this stop  */
     public void addInEdge(Edge edge) {
-        for (Edge e : inEdges) {
-            if (e.fromStop().equals(edge.fromStop())) {
-                return;
-            }
-        }
         this.inEdges.add(edge);
     }
 
