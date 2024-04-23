@@ -97,22 +97,12 @@ public class NetworkViewer {
             controlsGrid.add(walkingDistanceSlider,    2, 0);
             controlsGrid.add(walkingDistanceTextField, 3, 0);
 
-            controlsGrid.add(startAndGoalLabel,        1, 1);
-            controlsGrid.add(startTextField,           2, 1);
-            controlsGrid.add(goalTextField,            3, 1);
-
             //Set the handlers for the controls.
             reloadButton.setOnAction(this::handleReload);
             quitButton.setOnAction(this::handleQuit);
 
             walkingDistanceTextField.setOnAction(this::handleWalkingDistance);
             walkingDistanceSlider.setOnMouseReleased(this::handleWalkingDistanceSlider);
-
-
-            startTextField.setOnAction(this::handleStartAction);
-            startTextField.setOnKeyReleased(this::handleStartGoalKey);
-            goalTextField.setOnAction(this::handleGoalAction);
-            goalTextField.setOnKeyReleased(this::handleStartGoalKey);
 
             mapCanvas.setOnMouseClicked(this::handleMouseClick);
             mapCanvas.setOnMouseDragged(this::handleMouseDrag);
@@ -285,8 +275,6 @@ public class NetworkViewer {
      */
     public void resetSearch(){
         pathEdges = null;
-        setStartLocation(null);
-        setGoalLocation(null);
     }
 
 
@@ -318,42 +306,6 @@ public class NetworkViewer {
         event.consume();
     }
 
-    /**
-     * When ENTER is pressed, set the start location
-     * Call shortestPath finder to get path and draw graph.
-     */
-    public void handleStartAction(ActionEvent event) {
-        // System.out.println("Look up event " + event.getEventType() + "  "
-        //                    + ((TextField) event.getSource()).getText());
-
-        // set the start search location
-        setStartLocation(graph.getFirstMatchingStop(((TextField) event.getSource()).getText()));
-        
-        // perform A* search and get the path edges
-        pathEdges = AStar.findShortestPath(startLocation, goalLocation);
-
-        drawMap(graph); // redraw the graph with the new path
-        event.consume();
-    }
-
-    /**
-     * When ENTER is pressed, set the goal location
-     * Call shortestPath finder to get path and draw graph.
-     */
-    public void handleGoalAction(ActionEvent event) {
-        // System.out.println("Look up event " + event.getEventType() + "  "
-        //                    + ((TextField) event.getSource()).getText());
-
-        // set the goal search location
-        setGoalLocation(graph.getFirstMatchingStop(((TextField) event.getSource()).getText()));
-
-        // perform A* search and get the path edges
-        pathEdges = AStar.findShortestPath( startLocation, goalLocation);
-
-        drawMap(graph); // redraw the graph with the new path
-        event.consume();
-    }
-
     private Stop goalStop = null;
     private Stop prevStartStop = null;
 
@@ -380,38 +332,10 @@ public class NetworkViewer {
 
         Stop closestStop = findClosestStop(location, graph);
         if (closestStop != null) {
-            if (event.isShiftDown() ) {// if shift is pressed, just set the node to be the goal node
-                setGoalLocation(closestStop);
-            }
-            else if (startLocation==null){ // if start location is empty, set the node to be the start location
-                setStartLocation(closestStop);
-            }
-            else if (goalLocation == null ) {
-                setGoalLocation(closestStop);
-            }
-            else { 
-                setStartLocation(goalLocation);
-                setGoalLocation(closestStop);
-            }
-                // INFO: This is where your find path code is called during clicking
-            pathEdges = AStar.findShortestPath(startLocation, goalLocation);
-            drawMap(graph);
+            displayText.setText(closestStop.toString());
         }
         event.consume();
     }
-
-    /** Set start location and display it */
-    public void setStartLocation(Stop stop){
-        startLocation = stop;
-        startTextField.setText(stop != null?stop.getName():"");
-    }
-
-    /** Set goal location and display it */
-    public void setGoalLocation(Stop stop){
-        goalLocation = stop;
-        goalTextField.setText(stop != null?stop.getName():"");
-    }
-
 
     /**
      * Find the closest stop to the given Gis Point location
@@ -632,23 +556,9 @@ public class NetworkViewer {
             drawEdge(edge);
         }
 
-        // draw the path as highlighted edges
-        // Print the details of the path in the text pane below the map
-        // (NOT NEEDED FOR PARTS 2 and 3)
-        drawPath();
-        reportPath();
-
         // Draw the stops
         for(Stop stop : graph.getStops()) {
             drawStop(stop, STOP_SIZE, Color.BLUE);
-        }
-        // Highlight Start and Goal nodes
-        // (NOT NEEDED FOR PARTS 2 AND 3)
-        if (startLocation != null) {
-            drawStop(startLocation, STOP_SIZE*2, Color.GREEN);
-        }
-        if (goalLocation != null) {
-            drawStop(goalLocation, STOP_SIZE*2, Color.RED);
         }
     }
 
