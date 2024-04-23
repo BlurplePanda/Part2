@@ -77,6 +77,7 @@ public class NetworkViewer {
             // The controls
             Button reloadButton = new Button("Reload Map");
             Button quitButton = new Button("Quit");
+            Button componentsButton = new Button("Compute strongly connected components");
 
             Label walkingLabel = new Label("Set max walking dist:");
             walkingDistanceTextField = new TextField();
@@ -96,10 +97,12 @@ public class NetworkViewer {
             controlsGrid.add(walkingLabel,             1, 0);
             controlsGrid.add(walkingDistanceSlider,    2, 0);
             controlsGrid.add(walkingDistanceTextField, 3, 0);
+            controlsGrid.add(componentsButton, 1, 1);
 
             //Set the handlers for the controls.
             reloadButton.setOnAction(this::handleReload);
             quitButton.setOnAction(this::handleQuit);
+            componentsButton.setOnAction(this::handleComponents);
 
             walkingDistanceTextField.setOnAction(this::handleWalkingDistance);
             walkingDistanceSlider.setOnMouseReleased(this::handleWalkingDistanceSlider);
@@ -181,7 +184,15 @@ public class NetworkViewer {
     // ---------------------------------
     //  Handling the UI: RELOAD and QUIT buttons
     // ---------------------------------
-    
+
+    /**
+     * Handle the Component computing button
+     */
+    public void handleComponents(ActionEvent event) {
+        event.consume();
+        Components.findComponents(graph);
+    }
+
     /**
      * Handle the ReloadButton by selecting the directory which should have the data files in it.
      */

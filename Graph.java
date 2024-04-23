@@ -1,11 +1,7 @@
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
 
@@ -54,7 +50,7 @@ public class Graph {
         System.out.println("\n=============================\nStops:");
         for (Stop stop : stops){
             System.out.println(stop);
-            System.out.println("  "+stop.getEdges().size()+"  out edges; ");
+            System.out.println("  "+stop.getOutEdges().size()+"  out edges; ");
         }
         System.out.println("===============");
     }
@@ -79,7 +75,8 @@ public class Graph {
                 Stop to   = line.getStops().get(i+1);
                 double distance = from.distanceTo(to);
                 Edge edge = new Edge(from, to, transpType, line, distance);
-                from.addEdge(edge);
+                from.addOutEdge(edge);
+                to.addInEdge(edge);
                 edges.add(edge);
             }
         }
@@ -102,7 +99,8 @@ public class Graph {
                 double dist = stop1.distanceTo(stop2);
                 if (dist <= walkingDistance) {
                     Edge edge = new Edge(stop1, stop2, Transport.WALKING, null, dist);
-                    stop1.addEdge(edge);
+                    stop1.addOutEdge(edge);
+                    stop2.addInEdge(edge);
                     edges.add(edge);
                 }
             }

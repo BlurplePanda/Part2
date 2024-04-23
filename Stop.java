@@ -1,6 +1,5 @@
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 import java.util.HashSet;
 
 /**
@@ -14,8 +13,9 @@ public class Stop implements Comparable<Stop> {
     private String name;
     private String id;
 
-    // data structure for holding the (directed) edges out of the stop
-    private Collection<Edge> edges = new HashSet<Edge>();
+    // data structure for holding the (directed) outEdges out of the stop
+    private Collection<Edge> outEdges = new HashSet<Edge>();
+    private Collection<Edge> inEdges = new HashSet<Edge>();
 
     // data structure for holding a link to the lines that stop is part of   
     private Collection<Line> lines = new HashSet<Line>();
@@ -129,26 +129,53 @@ public class Stop implements Comparable<Stop> {
     //--------------------------------------------
     //  Setting and getting the neighbours of the stop
     //
-    //  edges is a collection of the (directed) edges out of the stop, 
+    //  outEdges is a collection of the (directed) edges out of the stop,
     //--------------------------------------------
 
-    /** Get the collection of edges*/
-    public Collection<Edge> getEdges() {
-        return Collections.unmodifiableCollection(edges);
+    /** Get the collection of outEdges*/
+    public Collection<Edge> getOutEdges() {
+        return Collections.unmodifiableCollection(outEdges);
     }
          
     /** add a new edge out of this stop  */
-    public void addEdge(Edge edge) {
-        this.edges.add(edge);
+    public void addOutEdge(Edge edge) {
+        for (Edge e : outEdges) {
+            if (e.toStop().equals(edge.toStop())) {
+                return;
+            }
+        }
+        this.outEdges.add(edge);
     }
 
+    //--------------------------------------------
+    //  Setting and getting the neighbours of the stop
+    //
+    //  outEdges is a collection of the (directed) edges out of the stop,
+    //--------------------------------------------
+
+    /** Get the collection of outEdges*/
+    public Collection<Edge> getInEdges() {
+        return Collections.unmodifiableCollection(inEdges);
+    }
+
+    /** add a new edge out of this stop  */
+    public void addInEdge(Edge edge) {
+        for (Edge e : inEdges) {
+            if (e.fromStop().equals(edge.fromStop())) {
+                return;
+            }
+        }
+        this.inEdges.add(edge);
+    }
+
+
     /**
-     * Delete edges of the specified type.
-     * [needed for removing Walking edges]
+     * Delete outEdges of the specified type.
+     * [needed for removing Walking outEdges]
      */
     public void deleteEdgesOfType(String type) {
-        // remove edges that are of the specified type
-        edges.removeIf((Edge e)->type.equals(e.transpType()));
+        // remove outEdges that are of the specified type
+        outEdges.removeIf((Edge e)->type.equals(e.transpType()));
     }
 
 
