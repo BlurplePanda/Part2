@@ -110,6 +110,9 @@ public class Graph {
             for (Stop stop2 : stops) {
                 double dist = stop1.distanceTo(stop2);
                 if (dist <= walkingDistance) {
+                    if (isConnected(stop1, stop2)) {
+                        continue;
+                    }
                     Edge edge = new Edge(stop1, stop2, Transport.WALKING, null, dist);
                     stop1.addOutEdge(edge);
                     stop2.addInEdge(edge);
