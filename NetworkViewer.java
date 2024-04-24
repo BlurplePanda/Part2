@@ -124,15 +124,15 @@ public class NetworkViewer {
 
     private static final int STOP_SIZE = 5; // drawing size of stops
     private static final double EDGE_WIDTH = 0.5; // drawing size of edges
+    private Stop closestStop;
 
-    
+
     // Methods to access the fields  (used in Projection class)
 
     public double getScale() {return scale;}
     public GisPoint getOrigin() {return mapOrigin;}
     public Canvas getMapCanvas() {return mapCanvas;}
     public double getRatioLatLon() {return ratioLatLon;}
-
 
 
     //---------------------------------------------
@@ -271,6 +271,7 @@ public class NetworkViewer {
      */
     public void resetSearch(){
         components = null;
+        closestStop = null;
     }
 
 
@@ -290,10 +291,11 @@ public class NetworkViewer {
         Point2D screenPoint = new Point2D(event.getX(), event.getY());
         GisPoint location = Projection.screen2Model(screenPoint, this);
 
-        Stop closestStop = findClosestStop(location, graph);
+        closestStop = findClosestStop(location, graph);
         if (closestStop != null) {
             displayText.setText(closestStop.toString());
         }
+        drawMap(graph);
         event.consume();
     }
 
@@ -520,6 +522,9 @@ public class NetworkViewer {
             for (Stop stop : graph.getStops()) {
                 drawStop(stop, STOP_SIZE, Color.BLUE);
             }
+            if (closestStop != null) {
+                drawStop(closestStop, STOP_SIZE*2, Color.RED);
+            }
         }
         else {
             int numComponents = new HashSet<>(components.values()).size();
@@ -546,6 +551,7 @@ public class NetworkViewer {
             }
             // report all the strongly connected components in the text area
             displayText.clear();
+            displayText.appendText("findComponents -> "+betterComponents.keySet().size()+" components\n");
             for (int componentNum : betterComponents.keySet()) {
                 displayText.appendText(componentNum+": ");
                 for (Stop stop : betterComponents.get(componentNum)) {
